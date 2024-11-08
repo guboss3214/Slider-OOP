@@ -1,135 +1,142 @@
-(function () {
-    const container = document.querySelector("#carousel");
-    const slides = container.querySelectorAll(".slide");
-    const pauseBtn = container.querySelector("#pause");
-    const nextBtn = container.querySelector("#next");
-    const prevBtn = container.querySelector("#prev");
-    const indecator = container.querySelector(".indecators-container");
+function Carousel(){
+    this.container = document.querySelector("#carousel");
+    this.slides = this.container.querySelectorAll(".slide");
+    this.pauseBtn = this.container.querySelector("#pause");
+    this.nextBtn = this.container.querySelector("#next");
+    this.prevBtn = this.container.querySelector("#prev");
+    this.indecator = this.container.querySelector(".indecators-container");
 
-    let currentSlide = 0;
-    let isPlaying = true;
-    let intervalId = null;
-    const INTERVAL = 2000;
-    let startPosX = 0;
-    let endPosX = 0;
+    this.currentSlide = 0;
+    this.isPlaying = true;
+    this.intervalId = null;
+    this.INTERVAL = 2000;
+    this.startPosX = 0;
+    this.endPosX = 0;
+}
 
+Carousel.prototype = {
+    gotoSlide(n){
+        this.slides[this.currentSlide].classList.toggle("active");
+        this.updateIndecators(this.currentSlide);
+        this.currentSlide = (n + this.slides.length) % this.slides.length;
+        this.updateIndecators(this.currentSlide);
+        this.slides[this.currentSlide].classList.toggle("active");
+    },
 
-    function gotoSlide(n){
-        slides[currentSlide].classList.toggle("active");
-        updateIndecators(currentSlide);
-        currentSlide = (n + slides.length) % slides.length;
-        updateIndecators(currentSlide);
-        slides[currentSlide].classList.toggle("active");
-    }
+    tick(){
+        this.intervalId = setInterval(() => this.nextSlide(), this.INTERVAL);
+    },
 
-    function tick(){
-        intervalId = setInterval(nextSlide, INTERVAL);
-    }
-
-    function indicatorClickHandler(e){
+    indicatorClickHandler(e){
         const { target } = e;
         if(target && target.classList.contains("indecator")){
-            gotoSlide(+target.dataset.slideId);
-            pauseSlider();
+            this.gotoSlide(+target.dataset.slideId);
+            this.pauseSlider();
         }
-    }
+    },
 
-    function updateIndecators(num){
-        indecator.children[num].classList.toggle("sync");
-    }
+    updateIndecators(num){
+        this.indecator.children[num].classList.toggle("sync");
+    },
 
-    function addIndicators(slides){
+    addIndicators(slides){
         for(let i = 0; i < slides.length; i++){
             const div = document.createElement("div");
             div.setAttribute("data-slide-id", i);
             div.classList.add("indecator");
-            indecator.appendChild(div);
+            this.indecator.appendChild(div);
         }
-        indecator.children[0].classList.add("sync");
-    }
+        this.indecator.children[0].classList.add("sync");
+    },
 
 
-    function pausePlaySliderHandler(){
-        isPlaying ? pauseSlider() : playSlider();
-    }
+    pausePlaySliderHandler(){
+        this.isPlaying ? this.pauseSlider() : this.playSlider();
+    },
 
-    function pauseSlider(){
-        pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-        clearInterval(intervalId);
-        isPlaying = false;
-    }
-    function playSlider(){
-        pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-        tick();
-        isPlaying = true;
-    }
-    function nextSlide() {
-        gotoSlide(currentSlide + 1);
-    }
+    pauseSlider(){
+        this.pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+        clearInterval(this.intervalId);
+        this.isPlaying = false;
+    },
+    playSlider(){
+        this.pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+        this.tick();
+        this.isPlaying = true;
+    },
+    nextSlide() {
+        this.gotoSlide(this.currentSlide + 1);
+    },
 
-    function prevSlide() {
-        gotoSlide(currentSlide - 1);
-    }
+    prevSlide() {
+        this.gotoSlide(this.currentSlide - 1);
+    },
 
-    function nextClickHandler(){
-        pauseSlider();
-        nextSlide();
-    }
+    nextClickHandler(){
+        this.pauseSlider();
+        this.nextSlide();
+    },
 
-    function prevClickHandler(){
-        pauseSlider();
-        prevSlide();
-    }
+    prevClickHandler(){
+        this.pauseSlider();
+        this.prevSlide();
+    },
 
-    function pressKeyHandler(e){
-        if(e.keyCode === 39) nextClickHandler();
-        if(e.keyCode === 37) prevClickHandler();
+    pressKeyHandler(e){
+        if(e.keyCode === 39) this.nextClickHandler();
+        if(e.keyCode === 37) this.prevClickHandler();
         if(e.keyCode === 32){
             e.preventDefault();
-            pausePlaySliderHandler();
+            this.pausePlaySliderHandler();
         }
-    }
+    },
 
-    function swipeStartHandler(e){
+    swipeStartHandler(e){
         if(e instanceof MouseEvent){
-            startPosX = e.pageX;
+            this.startPosX = e.pageX;
             return;
         }
         if(e instanceof TouchEvent){
-            startPosX = e.changedTouches[0].pageX; 
+            this.startPosX = e.changedTouches[0].pageX; 
         }
         
-    }
+    },
 
-    function swipeEndHandler(e){
+    swipeEndHandler(e){
         if(e instanceof MouseEvent){
-            endPosX = e.pageX;
+            this.endPosX = e.pageX;
         }
         else if(e instanceof TouchEvent){
-            endPosX = e.changedTouches[0].pageX;
+            this.endPosX = e.changedTouches[0].pageX;
         }
         
-        if (startPosX - endPosX > 100) nextClickHandler();
-        if (startPosX - endPosX < -100) prevClickHandler();
-    }
+        if (this.startPosX - this.endPosX > 100) this.nextClickHandler();
+        if (this.startPosX - this.endPosX < -100) this.prevClickHandler();
+    },
 
 
-    function initListeners(){
-        pauseBtn.addEventListener("click", pausePlaySliderHandler);
-        nextBtn.addEventListener("click", nextClickHandler);
-        prevBtn.addEventListener("click", prevClickHandler);
-        indecator.addEventListener("click", indicatorClickHandler);
-        document.addEventListener("keydown", pressKeyHandler);
-        container.addEventListener("touchstart", swipeStartHandler);
-        container.addEventListener("mousedown", swipeStartHandler);
-        container.addEventListener("touchend", swipeEndHandler);
-        container.addEventListener("mouseup", swipeEndHandler);
-    }
-    function init(){
-        initListeners();
-        addIndicators(slides);
-        tick();
-    }
-    init();
-}())
+    initListeners(){
+        this.pauseBtn.addEventListener("click", this.pausePlaySliderHandler.bind(this));
+        this.nextBtn.addEventListener("click", this.nextClickHandler.bind(this));
+        this.prevBtn.addEventListener("click", this.prevClickHandler.bind(this));
+        this.indecator.addEventListener("click", this.indicatorClickHandler.bind(this));
+        document.addEventListener("keydown", this.pressKeyHandler.bind(this));
+        this.container.addEventListener("touchstart", this.swipeStartHandler.bind(this));
+        this.container.addEventListener("mousedown", this.swipeStartHandler.bind(this));
+        this.container.addEventListener("touchend", this.swipeEndHandler.bind(this));
+        this.container.addEventListener("mouseup", this.swipeEndHandler.bind(this));
+    },
+    init(){
+        this.initListeners();
+        this.addIndicators(this.slides);
+        this.tick();
+    },
+}
+
+Carousel.prototype.constructor = Carousel;
+
+const carousel = new Carousel();
+carousel.init();
+
+
 
