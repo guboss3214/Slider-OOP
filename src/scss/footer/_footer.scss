@@ -1,0 +1,17 @@
+@use 'mixins' as *;
+
+.footer{
+    background-color: #333333;
+    color: #ffffff;
+    padding: 20px;
+
+    &__container{
+        @extend %container;
+    }
+
+    &__text{
+        text-align: center;
+        font-size: 1.2rem;
+    }
+}
+

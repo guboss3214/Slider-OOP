@@ -1,0 +1,28 @@
+.indecators-container{
+    width: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    bottom: 0;
+    padding: 10px;
+
+    & div{
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        border: 1px solid black;
+        background-color: #ffffff;
+        cursor: pointer;
+    }
+
+    & div:hover{
+        background-color: #c2c0c0;
+    }
+
+    & div.sync{
+        background-color: #c2c0c0;
+    }
+}
+
